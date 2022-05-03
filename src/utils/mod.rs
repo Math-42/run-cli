@@ -14,3 +14,76 @@ pub struct UserCredentials {
 	pub user_email: String,
 	pub user_password: String,
 }
+
+impl Project {
+	pub fn save_configs(&self) {
+		let toml = toml::to_string(&self).unwrap();
+		std::fs::File::create(format!("./{}/.run-cli/run-cli.toml", self.name))
+			.expect("failed to create run-cli config file");
+
+		std::fs::write(
+			format!("./{}/.run-cli/run-cli.toml", self.name),
+			&toml.to_string(),
+		)
+		.expect("failed to save run-cli config file");
+	}
+
+	pub fn read_configs() -> Option<Project> {
+		match std::fs::read_to_string("./run-cli/run-cli.toml") {
+			Ok(string) => {
+				let toml: Project = toml::from_str(&string).unwrap();
+				return Some(toml);
+			}
+			Err(_) => return None,
+		};
+	}
+}
+
+impl UserCredentials {
+	fn save_credentials(&self, path: String) {
+		let toml = toml::to_string(&self).unwrap();
+		std::fs::File::create(&path).expect("failed to create run-cli credentials file");
+
+		std::fs::write(path, &toml.to_string()).expect("failed to save run-cli credentials file");
+	}
+
+	pub fn save_credentials_globally(&self) {
+		std::fs::create_dir_all(format!(
+			"{}/.config/.run-cli/",
+			home::home_dir().unwrap().display()
+		))
+		.unwrap();
+		self.save_credentials(format!(
+			"{}/.config/.run-cli/run-cli-credentials.toml",
+			home::home_dir().unwrap().display()
+		));
+	}
+
+	pub fn save_credentials_locally(&self) {
+		self.save_credentials("./.run-cli/run-cli-credentials.toml".to_string());
+	}
+
+	fn read_credentials(path: String) -> Option<UserCredentials> {
+		match std::fs::read_to_string(path) {
+			Ok(string) => {
+				let toml: UserCredentials = toml::from_str(&string).unwrap();
+				return Some(toml);
+			}
+			Err(_) => return None,
+		};
+	}
+
+	pub fn read_credentials_globally() -> Option<UserCredentials> {
+		return UserCredentials::read_credentials(format!(
+			"{}/.config/.run-cli/run-cli-credentials.toml",
+			home::home_dir().unwrap().display()
+		));
+	}
+
+	pub fn read_credentials_locally(project: Project) -> Option<UserCredentials> {
+		return UserCredentials::read_credentials(format!(
+			"./{}/.run-cli/run-cli-credentials.toml",
+			project.name
+		));
+	}
+}
