@@ -88,6 +88,8 @@ What it can do:
   - [ ] Java
   - [x] Zip/MakeFile
   - [ ] Python
+- [x] Download exercise descriptions
+- [x] Download exercise related files
 - [x] Run and compile your code
 - [x] Download all test cases
 - [x] Run your test cases locally
