@@ -93,7 +93,10 @@ What it can do:
 - [x] Run and compile your code
 - [x] Download all test cases
 - [x] Run your test cases locally
+  - [ ] Run a specific test case
+- [ ] Generate a report for the test cases output
 - [ ] Send your submission to run.codes
+- [ ] Show your run.codes results
 - [ ] Subscribe in new courses
 - [ ] Get the input of the closed test cases
 - [ ] Import projects from git/run.codes
@@ -168,7 +171,32 @@ Run:
 
 To get a full list of possible commands.
 
+```
+run-cli 0.1.0
+
+USAGE:
+    run-cli <SUBCOMMAND>
+
+OPTIONS:
+    -h, --help       Print help information
+    -V, --version    Print version information
+
+SUBCOMMANDS:
+    build                Compile the project
+    help                 Print this message or the help of the given subcommand(s)
+    import               import a project from a git repo or from run codes
+    init                 Start a new project
+    run                  Runs the project
+    secret               Get the closed test cases
+    send                 Submit the current project to run.codes
+    store-credentials    Set the user credentials
+    subscribe            Enroll to a new class
+    test                 Run all test cases
+    update               Update the data of the exercise
+```
+
 <p align="right">(<a href="#top">back to top</a>)</p>
+
 
 <!-- CONTRIBUTING -->
 ## How to Contribute
