@@ -132,11 +132,7 @@ How to get started with the project
 
 ### Prerequisites
 
-First you will need to install rust.
-
-  ```sh
-    curl https://sh.rustup.rs -sSf | sh npm install npm@latest -g
-  ```
+First you will need to install [rust](https://www.rust-lang.org/tools/install).
 
 ### Installation
 
