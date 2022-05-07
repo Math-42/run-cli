@@ -27,9 +27,8 @@ pub fn run(_args: &clap::ArgMatches) {
 			return;
 		}
 	}
-	
 	match run_project() {
-		Ok(_) => println!("running..."),
+		Ok(_) => {}
 		Err(_) => println!("Error running the project"),
 	}
 }
