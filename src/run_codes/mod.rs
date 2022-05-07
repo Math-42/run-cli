@@ -1,4 +1,4 @@
-use crate::utils::{Project, UserCredentials};
+use crate::utils::{UserCredentials};
 use reqwest::Url;
 use scraper::{Html, Selector};
 use std::io::Write;
@@ -31,7 +31,7 @@ pub fn init_client() -> reqwest::blocking::Client {
 impl Exercise {
     pub fn formatted_option(&self) -> String {
         format!(
-            "{:<32}{:<32}{:<8}{:<8}{:<15}",
+            "{:<32}{:<14}{:<8}{:<7}{:<19}",
             self.name, self.status, self.correctness, self.grade, self.dead_line
         )
     }
