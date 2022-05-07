@@ -2,7 +2,7 @@
 description = "a simple run.codes cli front end with some extra features."
 edition = "2021"
 name = "run-cli"
-version = "0.1.0"
+version = "0.1.4"
 
 
 [dependencies]
@@ -19,3 +19,4 @@ chrono = "0.4.19"
 serde = "1.0"
 toml = "0.5.9"
 home = "0.5.3"
+colored = "2.0.0"
