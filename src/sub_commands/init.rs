@@ -1,5 +1,6 @@
 use crate::run_codes;
 use crate::templates;
+use crate::utils;
 use crate::utils::{Project, UserCredentials};
 use crate::zip;
 use dialoguer::{theme::ColorfulTheme, Select};
@@ -27,29 +28,7 @@ pub fn run(args: &clap::ArgMatches) {
 	println!("Initializing project...");
 
 	let client = run_codes::init_client();
-	let user_credentials: UserCredentials;
-
-	if args.is_present("local") {
-		run_codes::login_loop(&client);
-	} else {
-		match UserCredentials::read_credentials_globally() {
-			Some(credentials) => {
-				if !run_codes::login(&client, &credentials) {
-					println!("No valid credentials founded!!");
-					println!("Please insert your credentials");
-					user_credentials = run_codes::login_loop(&client);
-					user_credentials.save_credentials_globally();
-				}
-			}
-			None => {
-				println!("No valid credentials founded!!");
-				println!("Please insert your credentials");
-				user_credentials = run_codes::login_loop(&client);
-				user_credentials.save_credentials_globally();
-			}
-		}
-	}
-
+	let user_credentials: UserCredentials = utils::login(&client, args.is_present("local"));
 	println!("Logged with success!");
 
 	let courses = run_codes::get_all_courses(&client);
@@ -109,4 +88,8 @@ pub fn run(args: &clap::ArgMatches) {
 	zip::unzip_test_cases(&project);
 
 	project.save_configs();
+
+	if args.is_present("local") {
+		user_credentials.save_credentials_locally();
+	}
 }
