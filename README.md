@@ -81,7 +81,7 @@ What it can do:
 - [x] Login in run codes site
 - [x] Save your credentials
 - [x] Select a course an a exercise
-- [ ] Show a list of upcoming exercises
+- [x] Show a list of upcoming exercises
 - [ ] Create a initial template from your submission type selection
   - [x] C++
   - [x] C
@@ -105,7 +105,6 @@ What it can do:
 
 See the [open issues](https://github.com/Math-42/run-cli/issues) for a full list of proposed features (and known issues).
 
-<p align="right">(<a href="#top">back to top</a>)</p>
 
 ### Built With [Rust](https://www.rust-lang.org/)
 
@@ -123,8 +122,9 @@ Used libraries:
 * [serde](https://crates.io/crates/serde)
 * [toml](https://crates.io/crates/toml)
 * [home](https://crates.io/crates/home)
+* [colored](https://crates.io/crates/colored)
+* [rust-embed](https://crates.io/crates/rust-embed)
 
-<p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- GETTING STARTED -->
 ## Getting Started
@@ -155,7 +155,6 @@ First you will need to install [rust](https://www.rust-lang.org/tools/install).
    run-cli init
    ```
 
-<p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- USAGE EXAMPLES -->
 ## Usage
@@ -169,7 +168,29 @@ Run:
 To get a full list of possible commands.
 
 ```
-run-cli 0.1.0
+run-cli 0.1.6
+A run.codes cli front end with some extra features.
+
+USAGE:
+    run-cli <SUBCOMMAND>
+
+OPTIONS:
+    -h, --help       Print help information
+    -V, --version    Print version information
+
+SUBCOMMANDS:
+    build          Compile the project
+    credentials    Set the user credentials
+    fetch          Show the next exercises
+    help           Print this message or the help of the given subcommand(s)
+    import         Import a project from a git repo or from run codes
+    init           Start a new project
+    run            Runs the project
+    secret         Get the closed test cases
+    send           Submit the current project to run.codes
+    subscribe      Enroll to a new class
+    test           Run all test cases
+    update         Update the data of the exerciserun-cli 0.1.0
 
 USAGE:
     run-cli <SUBCOMMAND>
@@ -192,9 +213,6 @@ SUBCOMMANDS:
     update               Update the data of the exercise
 ```
 
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
 <!-- CONTRIBUTING -->
 ## How to Contribute
 
@@ -204,21 +222,19 @@ SUBCOMMANDS:
 4. Push to the Branch (`git push origin features/feature-name`)
 5. Open a Pull Request
 
-<p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- LICENSE -->
 ## License
 
 Distributed under the MIT License. See `LICENSE.txt` for more information.
 
-<p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- CONTACT -->
 ## Contact
 
 Your Name - [@NedLandy](https://twitter.com/NedLandy) - matheus.vieira.g@usp.br
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+<p align="right"><a href="#top">back to top</a></p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
