@@ -1,6 +1,7 @@
 mod cli;
 mod run_codes;
 mod sub_commands;
+mod templates;
 mod utils;
 mod zip;
 

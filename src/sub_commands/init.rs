@@ -1,12 +1,11 @@
 use crate::run_codes;
+use crate::templates;
 use crate::utils::{Project, UserCredentials};
 use crate::zip;
 use dialoguer::{theme::ColorfulTheme, Select};
 use git2::Repository;
 
 fn create_project_structure(project: &Project) {
-	std::fs::create_dir_all(format!("{}/{}", project.name, "src")).unwrap();
-
 	std::fs::create_dir_all(format!("{}/test-cases/{}", project.name, "inputs")).unwrap();
 	std::fs::create_dir_all(format!("{}/test-cases/{}", project.name, "outputs")).unwrap();
 	std::fs::create_dir_all(format!("{}/test-cases/{}", project.name, "local-attempts")).unwrap();
@@ -95,7 +94,7 @@ pub fn run(args: &clap::ArgMatches) {
 
 	println!("Creating project structure");
 	create_project_structure(&project);
-
+	templates::build_struct(&project);
 
 	println!("Downloading exercise files...");
 	run_codes::download_exercise_files(&client, &selected_exercise);

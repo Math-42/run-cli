@@ -81,13 +81,14 @@ What it can do:
 - [x] Login in run codes site
 - [x] Save your credentials
 - [x] Select a course an a exercise
+- [ ] Show a list of upcoming exercises
 - [ ] Create a initial template from your submission type selection
-  - [ ] C++
-  - [ ] C
+  - [x] C++
+  - [x] C
   - [ ] Haskell
-  - [ ] Java
-  - [x] Zip/MakeFile
-  - [ ] Python
+  - [ ] Java 8
+  - [x] Zip MakeFile
+  - [x] Python 3
 - [x] Download exercise descriptions
 - [x] Download exercise related files
 - [x] Run and compile your code

@@ -1,4 +1,4 @@
-SOURCES =  $(wildcard *.c) $(wildcard ../src/**/*.c)
+SOURCES =  $(wildcard ./*.c) $(wildcard ./src/**/*.c)
 
 all:
 	@gcc $(SOURCES) -o bin
