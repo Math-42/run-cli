@@ -12,6 +12,9 @@ fn main() {
 		Some(("init", sub_matches)) => {
 			sub_commands::init::run(sub_matches);
 		}
+		Some(("fetch", sub_matches)) => {
+			sub_commands::fetch::run(sub_matches);
+		}
 		Some(("build", sub_matches)) => {
 			sub_commands::build::run(sub_matches);
 		}

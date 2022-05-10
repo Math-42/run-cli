@@ -14,7 +14,12 @@ pub fn cli() -> Command<'static> {
 						.required(false)
 						.allow_invalid_utf8(true),
 				)
-				.arg(arg!(-l --local "set the user credentials locally")),
+				.arg(arg!(-l --local "Set the user credentials locally")),
+		)
+		.subcommand(
+			Command::new("fetch")
+				.about("Show the next exercises")
+				.arg(arg!(-l --login "Login with custom credentials")),
 		)
 		.subcommand(Command::new("build").about("Compile the project"))
 		.subcommand(Command::new("run").about("Runs the project"))
@@ -40,7 +45,7 @@ pub fn cli() -> Command<'static> {
 		)
 		.subcommand(
 			Command::new("import")
-				.about("import a project from a git repo or from run codes")
+				.about("Import a project from a git repo or from run codes")
 				.arg(arg!(-r --run_codes <RUN_CODES_LINK> "Code of the new class").required(true))
 				.arg(arg!(-r --git <GIT_REPO_LINK> "Code of the new class").required(true)),
 		);
