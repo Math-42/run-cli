@@ -1,3 +1,4 @@
+use crate::run_codes;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize)]
@@ -86,4 +87,33 @@ impl UserCredentials {
 			project.name
 		));
 	}
+}
+
+pub fn login(client: &reqwest::blocking::Client, local: bool) -> UserCredentials {
+	let mut user_credentials = UserCredentials {
+		user_email: "".to_string(),
+		user_password: "".to_string(),
+	};
+
+	if local {
+		run_codes::login_loop(&client);
+	} else {
+		match UserCredentials::read_credentials_globally() {
+			Some(credentials) => {
+				if !run_codes::login(&client, &credentials) {
+					println!("No valid credentials founded!!");
+					println!("Please insert your credentials");
+					user_credentials = run_codes::login_loop(&client);
+					user_credentials.save_credentials_globally();
+				}
+			}
+			None => {
+				println!("No valid credentials founded!!");
+				println!("Please insert your credentials");
+				user_credentials = run_codes::login_loop(&client);
+				user_credentials.save_credentials_globally();
+			}
+		}
+	}
+	return user_credentials;
 }
