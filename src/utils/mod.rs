@@ -117,3 +117,13 @@ pub fn login(client: &reqwest::blocking::Client, local: bool) -> UserCredentials
 	}
 	return user_credentials;
 }
+
+pub fn is_a_project() -> bool {
+	match Project::read_configs() {
+		Some(_) => true,
+		None => {
+			println!("This is not a valid project, run-cli config file not found!!");
+			return false;
+		}
+	}
+}
