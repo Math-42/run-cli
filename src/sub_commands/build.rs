@@ -1,3 +1,5 @@
+use crate::utils;
+
 pub fn build_project() -> Result<bool, std::io::Error> {
 	let mut cmd = std::process::Command::new("make")
 		.arg("all")
@@ -18,8 +20,11 @@ pub fn build_project() -> Result<bool, std::io::Error> {
 }
 
 pub fn run(_args: &clap::ArgMatches) {
+	if !utils::is_a_project() {
+		return;
+	};
 	match build_project() {
 		Ok(_) => println!("Project builded with success!"),
-		Err(_) => println!("Error building the project")
+		Err(_) => println!("Error building the project"),
 	}
 }
