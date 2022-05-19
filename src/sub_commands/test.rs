@@ -1,154 +1,188 @@
 use crate::sub_commands::build;
+use crate::utils;
 use colored::Colorize;
 
 pub struct TestOutput {
-    pub error: bool,
-    pub stdout: String,
-    pub stderr: String,
-    pub cpu_time: i32,
+	pub error: bool,
+	pub stdout: String,
+	pub stderr: String,
+	pub cpu_time: i32,
 }
 
 impl TestOutput {
-    pub fn save(&self, path: String) {
-        std::fs::write(format!("{}.out", &path), &self.stdout)
-            .expect("failed to save test output file");
+	pub fn save(&self, path: String) {
+		std::fs::write(format!("{}.out", &path), &self.stdout)
+			.expect("failed to save test output file");
 
-        if self.error {
-            std::fs::write(format!("{}.err", &path), &self.stderr)
-                .expect("failed to save test error file");
-        }
-    }
+		if self.error {
+			std::fs::write(format!("{}.err", &path), &self.stderr)
+				.expect("failed to save test error file");
+		}
+	}
 }
 
 pub fn run_test_case(test_case_name: &String) -> TestOutput {
-    let file =
-        std::fs::File::open(format!("./test-cases/inputs/{0}/{0}.in", test_case_name)).unwrap();
+	let file =
+		std::fs::File::open(format!("./test-cases/inputs/{0}/{0}.in", test_case_name)).unwrap();
 
-    let mut shell = std::process::Command::new("make");
+	let mut shell = std::process::Command::new("make");
 
-    let process = shell.arg("run").stdin(std::process::Stdio::from(file));
+	let process = shell.arg("run").stdin(std::process::Stdio::from(file));
 
-    let output = process
-        .stdout(std::process::Stdio::piped())
-        .output()
-        .expect("Error running the test case");
+	let output = process
+		.stdout(std::process::Stdio::piped())
+		.output()
+		.expect("Error running the test case");
 
-    let test_error = !output.status.success();
-    let test_stdout = String::from_utf8_lossy(&output.stdout).to_string();
-    let test_stderr = String::from_utf8_lossy(&output.stderr).to_string();
+	let test_error = !output.status.success();
+	let test_stdout = String::from_utf8_lossy(&output.stdout).to_string();
+	let test_stderr = String::from_utf8_lossy(&output.stderr).to_string();
 
-    return TestOutput {
-        error: test_error,
-        stdout: test_stdout,
-        stderr: test_stderr,
-        cpu_time: 2,
-    };
+	return TestOutput {
+		error: test_error,
+		stdout: test_stdout,
+		stderr: test_stderr,
+		cpu_time: 2,
+	};
 }
 
 pub fn diff(
-    output_base_file_path: String,
-    output_test_file_path: String,
+	output_base_file_path: String,
+	output_test_file_path: String,
 ) -> (Option<i32>, String, String) {
-    let mut shell = std::process::Command::new("diff");
+	let mut shell = std::process::Command::new("diff");
 
-    let process = shell.arg(output_base_file_path).arg(output_test_file_path);
+	let process = shell.arg(output_base_file_path).arg(output_test_file_path);
 
-    let output = process
-        .stdout(std::process::Stdio::piped())
-        .output()
-        .expect("Error comparing the test case output");
+	let output = process
+		.stdout(std::process::Stdio::piped())
+		.output()
+		.expect("Error comparing the test case output");
 
-    return (
-        output.status.code(),
-        String::from_utf8_lossy(&output.stderr).to_string(),
-        String::from_utf8_lossy(&output.stdout).to_string(),
-    );
+	return (
+		output.status.code(),
+		String::from_utf8_lossy(&output.stderr).to_string(),
+		String::from_utf8_lossy(&output.stdout).to_string(),
+	);
+}
+
+pub fn save_diff(
+	diff_stdout: &String,
+	diff_stderr: &String,
+	diff_code: &Option<i32>,
+	time_stamp: &String,
+	test_case_name: &String,
+) {
+	std::fs::write(
+		format!(
+			"./test-cases/local-attempts/{0}/{1}/{1}.diff",
+			time_stamp, test_case_name
+		),
+		match diff_code {
+			Some(2) => diff_stderr,
+			Some(0) => "No differences founded",
+			Some(_) => diff_stdout,
+			None => diff_stdout,
+		},
+	)
+	.expect("failed to save test diff file");
 }
 
 pub fn run(_args: &clap::ArgMatches) {
-    println!("Building the project... \n");
-    if build::build_project().is_err() {
-        println!("Error building the project");
-        return;
-    }
-    println!();
+	if !utils::is_a_project() {
+		return;
+	};
+	println!("Building the project...");
+	if build::build_project().is_err() {
+		println!("Error building the project");
+		return;
+	}
 
-    let paths = std::fs::read_dir("./test-cases/inputs/").unwrap();
-    let time_stamp = chrono::offset::Local::now()
-        .format("%H:%M:%S_%d-%m-%Y")
-        .to_string();
+	let mut errors_counter = 0;
+	let mut passed_counter = 0;
+	let mut issues_counter = 0;
+	let mut failed_counter = 0;
 
-    println!("Starting the tests... \n");
-    for path in paths {
-        let dir_path = path.unwrap().path();
-        let is_dir = dir_path.is_dir();
+	let paths = std::fs::read_dir("./test-cases/inputs/").unwrap();
+	let time_stamp = chrono::offset::Local::now()
+		.format("%H:%M:%S_%d-%m-%Y")
+		.to_string();
 
-        if is_dir {
-            let test_case_name = dir_path
-                .file_stem()
-                .and_then(std::ffi::OsStr::to_str)
-                .unwrap()
-                .to_string();
+	println!("\nStarting the tests...");
 
-            std::fs::create_dir_all(format!(
-                "./test-cases/local-attempts/{}/{}",
-                time_stamp, test_case_name
-            ))
-            .unwrap();
+	for path in paths {
+		let dir_path = path.unwrap().path();
 
-            let test_output = run_test_case(&test_case_name);
+		if !dir_path.is_dir() {
+			continue;
+		}
 
-            test_output.save(format!(
-                "./test-cases/local-attempts/{}/{1}/{1}",
-                time_stamp, test_case_name
-            ));
+		let test_case_name = dir_path
+			.file_stem()
+			.and_then(std::ffi::OsStr::to_str)
+			.unwrap()
+			.to_string();
 
-            if test_output.error {
-                println!("Test {}: Failed with error", test_case_name);
-                println!("\n{}", test_output.stderr);
-                continue;
-            }
+		std::fs::create_dir_all(format!(
+			"./test-cases/local-attempts/{}/{}",
+			&time_stamp, test_case_name
+		))
+		.unwrap();
 
-            let (diff_code, diff_stderr, diff_stdout) = diff(
-                format!("./test-cases/outputs/{0}/{0}.out", test_case_name),
-                format!(
-                    "./test-cases/local-attempts/{1}/{0}/{0}.out",
-                    test_case_name, time_stamp
-                ),
-            );
+		let test_output = run_test_case(&test_case_name);
 
-            match diff_code {
-                Some(0) => println!(
-                    "Test {}: {}",
-                    test_case_name,
-                    format!("Passed").bold().green()
-                ),
-                Some(1) => println!(
-                    "Test {}: {}",
-                    test_case_name,
-                    format!("Failed").bold().red()
-                ),
-                Some(2) => println!(
-                    "Test {}: Missing testing files\n\n {}",
-                    test_case_name, diff_stderr
-                ),
-                Some(code) => panic!("Test {}: Unexpected exit code {}", test_case_name, code),
-                None => (),
-            }
+		test_output.save(format!(
+			"./test-cases/local-attempts/{}/{1}/{1}",
+			time_stamp, test_case_name
+		));
 
-            std::fs::write(
-                format!(
-                    "./test-cases/local-attempts/{0}/{1}/{1}.diff",
-                    time_stamp, test_case_name
-                ),
-                match diff_code {
-                    Some(2) => diff_stderr,
-                    Some(0) => String::from("No differences founded"),
-                    Some(_) => diff_stdout,
-                    None => diff_stdout,
-                },
-            )
-            .expect("failed to save test diff file");
-        }
-    }
+		if test_output.error {
+			println!("Test {}: {}", test_case_name, "Failed".bold().red());
+			errors_counter += 1;
+			println!("\n{}", test_output.stderr);
+			continue;
+		}
+
+		let (diff_code, diff_stderr, diff_stdout) = diff(
+			format!("./test-cases/outputs/{0}/{0}.out", test_case_name),
+			format!(
+				"./test-cases/local-attempts/{1}/{0}/{0}.out",
+				test_case_name, time_stamp
+			),
+		);
+
+		match diff_code {
+			Some(0) => println!("Test {}: {}", test_case_name, "Passed".bold().green()),
+			Some(1) => println!("Test {}: {}", test_case_name, "Failed".bold().red()),
+			Some(2) => println!(
+				"Test {}: Missing testing files\n\n {}",
+				test_case_name, diff_stderr
+			),
+			Some(code) => panic!("Test {}: Unexpected exit code {}", test_case_name, code),
+			None => (),
+		}
+
+		save_diff(
+			&diff_stdout,
+			&diff_stderr,
+			&diff_code,
+			&time_stamp,
+			&test_case_name,
+		);
+
+		match diff_code {
+			Some(0) => passed_counter += 1,
+			Some(1) => failed_counter += 1,
+			Some(_) => issues_counter += 1,
+			None => issues_counter += 1,
+		}
+	}
+
+	println!(
+		"{} Passed, {} Failed, {} erros and {} issue(s)",
+		passed_counter.to_string().bold().green(),
+		failed_counter.to_string().bold().red(),
+		errors_counter.to_string().bold().red(),
+		issues_counter
+	);
 }
