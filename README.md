@@ -80,9 +80,9 @@ What it can do:
 
 - [x] Login in run codes site
 - [x] Save your credentials
-- [x] Select a course an a exercise
+- [x] Select a course and a exercise
 - [x] Show a list of upcoming exercises
-- [ ] Create a initial template from your submission type selection
+- [ ] Create an initial template from your submission type selection
   - [x] C++
   - [x] C
   - [ ] Haskell
@@ -190,27 +190,8 @@ SUBCOMMANDS:
     send           Submit the current project to run.codes
     subscribe      Enroll to a new class
     test           Run all test cases
-    update         Update the data of the exerciserun-cli 0.1.0
+    update         Update the data of the exercise
 
-USAGE:
-    run-cli <SUBCOMMAND>
-
-OPTIONS:
-    -h, --help       Print help information
-    -V, --version    Print version information
-
-SUBCOMMANDS:
-    build                Compile the project
-    help                 Print this message or the help of the given subcommand(s)
-    import               import a project from a git repo or from run codes
-    init                 Start a new project
-    run                  Runs the project
-    secret               Get the closed test cases
-    send                 Submit the current project to run.codes
-    store-credentials    Set the user credentials
-    subscribe            Enroll to a new class
-    test                 Run all test cases
-    update               Update the data of the exercise
 ```
 
 <!-- CONTRIBUTING -->
@@ -228,11 +209,6 @@ SUBCOMMANDS:
 
 Distributed under the MIT License. See `LICENSE.txt` for more information.
 
-
-<!-- CONTACT -->
-## Contact
-
-Your Name - [@NedLandy](https://twitter.com/NedLandy) - matheus.vieira.g@usp.br
 
 <p align="right"><a href="#top">back to top</a></p>
 
