@@ -80,9 +80,9 @@ What it can do:
 
 - [x] Login in run codes site
 - [x] Save your credentials
-- [x] Select a course an a exercise
+- [x] Select a course and a exercise
 - [x] Show a list of upcoming exercises
-- [ ] Create a initial template from your submission type selection
+- [ ] Create an initial template from your submission type selection
   - [x] C++
   - [x] C
   - [ ] Haskell
@@ -209,11 +209,6 @@ SUBCOMMANDS:
 
 Distributed under the MIT License. See `LICENSE.txt` for more information.
 
-
-<!-- CONTACT -->
-## Contact
-
-Your Name - [@NedLandy](https://twitter.com/NedLandy) - matheus.vieira.g@usp.br
 
 <p align="right"><a href="#top">back to top</a></p>
 
