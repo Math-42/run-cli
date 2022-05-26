@@ -1,5 +1,7 @@
+use crate::utils;
 use crate::utils::UserCredentials;
 use colored::Colorize;
+use reqwest::blocking::multipart;
 use reqwest::Url;
 use scraper::{Html, Selector};
 use std::io::Write;
@@ -90,6 +92,21 @@ pub fn login(client: &reqwest::blocking::Client, credentials: &UserCredentials) 
 	let account_url = "https://run.codes/home";
 	let response = client.get(account_url).send().unwrap();
 	return response.url().eq(&Url::parse(account_url).unwrap());
+}
+
+pub fn submit_exercise(client: &reqwest::blocking::Client, project: &utils::Project) {
+	let form = multipart::Form::new()
+		.file("files[]", "./submission.zip")
+		.unwrap();
+
+	let res = client
+		.post(format!(
+			"https://run.codes/Exercises/commit/{}",
+			project.exercise_code
+		))
+		.multipart(form)
+		.send()
+		.unwrap();
 }
 
 pub fn login_loop(client: &reqwest::blocking::Client) -> UserCredentials {
@@ -368,16 +385,13 @@ pub fn get_exercise_description(client: &reqwest::blocking::Client, exercise: &E
 	let parsed_html = Html::parse_document(&response);
 
 	let exercise_body_selector = &Selector::parse("div[class=\"panel-body\"]").unwrap();
-	let advisor_files_selector = &Selector::parse("div[class~=\"panel-body\"] small>p").unwrap();
 
 	let description_element = parsed_html.select(&exercise_body_selector).nth(0).unwrap();
-	let advisor_element = parsed_html.select(&advisor_files_selector).nth(0).unwrap();
 
 	let description_wrong_links_text = format!(
-		"# {}\n\n{}\n{}.\n",
+		"# {}\n\n{}\n",
 		exercise.name,
 		html2md::parse_html(&description_element.html()),
-		advisor_element.text().collect::<String>()
 	);
 
 	let description_text = str::replace(
