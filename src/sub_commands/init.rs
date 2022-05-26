@@ -67,7 +67,8 @@ pub fn run(args: &clap::ArgMatches) {
 		name: selected_exercise.name.to_string(),
 		submission_type: selected_submission_type.to_string(),
 		course: selected_course.name.to_string(),
-		exercise: selected_exercise.link.to_string(),
+		exercise_link: selected_exercise.link.to_string(),
+		exercise_code: selected_exercise.code.to_string(),
 		global: false,
 	};
 
