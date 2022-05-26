@@ -83,7 +83,7 @@ pub fn save_diff(
 		),
 		match diff_code {
 			Some(2) => diff_stderr,
-			Some(0) => "No differences founded",
+			Some(0) => "No differences found",
 			Some(_) => diff_stdout,
 			None => diff_stdout,
 		},

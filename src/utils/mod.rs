@@ -102,14 +102,14 @@ pub fn login(client: &reqwest::blocking::Client, local: bool) -> UserCredentials
 		match UserCredentials::read_credentials_globally() {
 			Some(credentials) => {
 				if !run_codes::login(&client, &credentials) {
-					println!("No valid credentials founded!!");
+					println!("No valid credentials found!!");
 					println!("Please insert your credentials");
 					user_credentials = run_codes::login_loop(&client);
 					user_credentials.save_credentials_globally();
 				}
 			}
 			None => {
-				println!("No valid credentials founded!!");
+				println!("No valid credentials found!!");
 				println!("Please insert your credentials");
 				user_credentials = run_codes::login_loop(&client);
 				user_credentials.save_credentials_globally();
