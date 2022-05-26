@@ -2,7 +2,7 @@
 description = "A run.codes cli front end with some extra features."
 edition = "2021"
 name = "run-cli"
-version = "0.1.6"
+version = "0.9.1"
 
 [dependencies]
 chrono = "0.4.19"

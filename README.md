@@ -1,6 +1,5 @@
 # run-cli
 
-
 <div id="top"></div>
 <!--
 *** Thanks for checking out the Best-README-Template. If you have a suggestion
@@ -9,8 +8,6 @@
 *** Don't forget to give the project a star!
 *** Thanks again! Now go create something AMAZING! :D
 -->
-
-
 
 <!-- PROJECT SHIELDS -->
 <!--
@@ -69,8 +66,6 @@ A run-codes cli front end with some extra features
   </ol>
 </details>
 
-
-
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
@@ -95,16 +90,14 @@ What it can do:
 - [x] Download all test cases
 - [x] Run your test cases locally
   - [ ] Run a specific test case
-- [ ] Generate a report for the test cases output
-- [ ] Send your submission to run.codes
+- [x] Generate a report for the test cases output
+- [x] Send your submission to run.codes
 - [ ] Show your run.codes results
 - [ ] Subscribe in new courses
 - [ ] Get the input of the closed test cases
 - [ ] Import projects from git/run.codes
 
-
 See the [open issues](https://github.com/Math-42/run-cli/issues) for a full list of proposed features (and known issues).
-
 
 ### Built With [Rust](https://www.rust-lang.org/)
 
@@ -124,7 +117,6 @@ Used libraries:
 * [home](https://crates.io/crates/home)
 * [colored](https://crates.io/crates/colored)
 * [rust-embed](https://crates.io/crates/rust-embed)
-
 
 <!-- GETTING STARTED -->
 ## Getting Started
@@ -155,7 +147,6 @@ First you will need to install [rust](https://www.rust-lang.org/tools/install).
    run-cli init
    ```
 
-
 <!-- USAGE EXAMPLES -->
 ## Usage
 
@@ -167,8 +158,8 @@ Run:
 
 To get a full list of possible commands.
 
-```
-run-cli 0.1.6
+```sh
+run-cli 0.9.1
 A run.codes cli front end with some extra features.
 
 USAGE:
@@ -191,6 +182,8 @@ SUBCOMMANDS:
     subscribe      Enroll to a new class
     test           Run all test cases
     update         Update the data of the exercise
+USAGE:
+    run-cli <SUBCOMMAND>
 
 ```
 
@@ -203,12 +196,10 @@ SUBCOMMANDS:
 4. Push to the Branch (`git push origin features/feature-name`)
 5. Open a Pull Request
 
-
 <!-- LICENSE -->
 ## License
 
 Distributed under the MIT License. See `LICENSE.txt` for more information.
-
 
 <p align="right"><a href="#top">back to top</a></p>
 
