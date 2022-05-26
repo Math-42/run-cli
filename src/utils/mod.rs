@@ -5,7 +5,8 @@ use serde::{Deserialize, Serialize};
 pub struct Project {
 	pub name: String,
 	pub course: String,
-	pub exercise: String,
+	pub exercise_link: String,
+	pub exercise_code: String,
 	pub submission_type: String,
 	pub global: bool,
 }
@@ -30,7 +31,7 @@ impl Project {
 	}
 
 	pub fn read_configs() -> Option<Project> {
-		match std::fs::read_to_string("./run-cli/run-cli.toml") {
+		match std::fs::read_to_string("./.run-cli/run-cli.toml") {
 			Ok(string) => {
 				let toml: Project = toml::from_str(&string).unwrap();
 				return Some(toml);
@@ -120,7 +121,7 @@ pub fn login(client: &reqwest::blocking::Client, local: bool) -> UserCredentials
 
 pub fn is_a_project() -> bool {
 	match Project::read_configs() {
-		Some(_) => true,
+		Some(_) => return true,
 		None => {
 			println!("This is not a valid project, run-cli config file not found!!");
 			return false;
