@@ -6,7 +6,7 @@ pub struct TestOutput {
 	pub error: bool,
 	pub stdout: String,
 	pub stderr: String,
-	pub cpu_time: i32,
+	pub cpu_time: u128,
 }
 
 impl TestOutput {
@@ -27,6 +27,7 @@ pub fn run_test_case(test_case_name: &String) -> TestOutput {
 
 	let mut shell = std::process::Command::new("make");
 
+	let start = std::time::Instant::now();
 	let process = shell.arg("run").stdin(std::process::Stdio::from(file));
 
 	let output = process
@@ -35,6 +36,8 @@ pub fn run_test_case(test_case_name: &String) -> TestOutput {
 		.expect("Error running the test case");
 
 	let test_error = !output.status.success();
+	let cpu_time = start.elapsed();
+
 	let test_stdout = String::from_utf8_lossy(&output.stdout).to_string();
 	let test_stderr = String::from_utf8_lossy(&output.stderr).to_string();
 
@@ -42,7 +45,7 @@ pub fn run_test_case(test_case_name: &String) -> TestOutput {
 		error: test_error,
 		stdout: test_stdout,
 		stderr: test_stderr,
-		cpu_time: 2,
+		cpu_time: cpu_time.as_millis(),
 	};
 }
 
@@ -88,16 +91,7 @@ pub fn save_diff(
 	.expect("failed to save test diff file");
 }
 
-pub fn run(_args: &clap::ArgMatches) {
-	if !utils::is_a_project() {
-		return;
-	};
-	println!("Building the project...");
-	if build::build_project().is_err() {
-		println!("Error building the project");
-		return;
-	}
-
+pub fn run_all_tests() {
 	let mut errors_counter = 0;
 	let mut passed_counter = 0;
 	let mut issues_counter = 0;
@@ -105,10 +99,10 @@ pub fn run(_args: &clap::ArgMatches) {
 
 	let paths = std::fs::read_dir("./test-cases/inputs/").unwrap();
 	let time_stamp = chrono::offset::Local::now()
-		.format("%H:%M:%S_%d-%m-%Y")
+		.format("%d-%m-%Y_%H:%M:%S")
 		.to_string();
 
-	println!("\nStarting the tests...");
+	println!("Starting tests...\n");
 
 	for path in paths {
 		let dir_path = path.unwrap().path();
@@ -152,10 +146,15 @@ pub fn run(_args: &clap::ArgMatches) {
 		);
 
 		match diff_code {
-			Some(0) => println!("Test {}: {}", test_case_name, "Passed".bold().green()),
+			Some(0) => println!(
+				"Test {}: {}, {} ms",
+				test_case_name,
+				"Passed".bold().green(),
+				test_output.cpu_time
+			),
 			Some(1) => println!("Test {}: {}", test_case_name, "Failed".bold().red()),
 			Some(2) => println!(
-				"Test {}: Missing testing files\n\n {}",
+				"Test {}: Missing test files\n\n {}",
 				test_case_name, diff_stderr
 			),
 			Some(code) => panic!("Test {}: Unexpected exit code {}", test_case_name, code),
@@ -177,12 +176,29 @@ pub fn run(_args: &clap::ArgMatches) {
 			None => issues_counter += 1,
 		}
 	}
-
 	println!(
-		"{} Passed, {} Failed, {} erros and {} issue(s)",
+		"\n{} Passed, {} Failed, {} erros and {} issue(s)",
 		passed_counter.to_string().bold().green(),
 		failed_counter.to_string().bold().red(),
 		errors_counter.to_string().bold().red(),
 		issues_counter
 	);
+}
+
+pub fn run(args: &clap::ArgMatches) {
+	if !utils::is_a_project() {
+		return;
+	};
+
+	println!("Building project...");
+	if build::build_project().is_err() {
+		println!("Error building the project");
+		return;
+	}
+
+	if !args.is_present("number") {
+		run_all_tests();
+	} else {
+		println!("sorry, not implemented yet, but you can contribute in: https://github.com/Math-42/run-cli");
+	}
 }
