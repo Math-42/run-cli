@@ -30,13 +30,18 @@ pub fn cli() -> Command<'static> {
 					.allow_invalid_utf8(true),
 			),
 		)
-		.subcommand(Command::new("send").about("Submit the current project to run.codes"))
+		.subcommand(
+			Command::new("submit")
+				.about("Submit the current project to run.codes")
+				.arg(arg!(-l --local "Use local credentials").required(false)),
+		)
 		.subcommand(
 			Command::new("credentials")
 				.about("Set the user credentials")
 				.arg(arg!(-l --local "Change only the local credentials").required(false)),
 		)
 		.subcommand(Command::new("secret").about("Get the closed test cases"))
+		.subcommand(Command::new("zip").about("zip your main and the src folder"))
 		.subcommand(Command::new("update").about("Update the data of the exercise"))
 		.subcommand(
 			Command::new("subscribe")
