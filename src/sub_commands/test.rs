@@ -1,6 +1,7 @@
 use crate::sub_commands::build;
 use crate::utils;
 use colored::Colorize;
+use std::fs;
 
 pub struct TestOutput {
 	pub error: bool,
@@ -91,11 +92,13 @@ pub fn save_diff(
 	.expect("failed to save test diff file");
 }
 
-pub fn run_single_test(test_case_name: &String) -> Result<Option<i32>, std::io::Error> {
+pub fn run_single_test(test_case_name: &String, verbose: bool)
+	-> Result<Option<i32>, std::io::Error> {
 	let test_output = run_test_case(&test_case_name);
 	let time_stamp = chrono::offset::Local::now()
 		.format("%d-%m-%Y_%H:%M:%S")
 		.to_string();
+	let output_file = format!("./test-cases/outputs/{0}/{0}.out", test_case_name);
 
 	std::fs::create_dir_all(format!(
 		"./test-cases/local-attempts/{}/{}",
@@ -115,8 +118,7 @@ pub fn run_single_test(test_case_name: &String) -> Result<Option<i32>, std::io::
 				std::io::ErrorKind::Other, "Test Output Failed",));
 	}
 
-	let (diff_code, diff_stderr, diff_stdout) = diff(
-		format!("./test-cases/outputs/{0}/{0}.out", test_case_name),
+	let (diff_code, diff_stderr, diff_stdout) = diff(output_file.to_string(),
 		format!("./test-cases/local-attempts/{1}/{0}/{0}.out",
 			test_case_name, time_stamp
 		),
@@ -137,6 +139,13 @@ pub fn run_single_test(test_case_name: &String) -> Result<Option<i32>, std::io::
 		None => (),
 	}
 
+	if verbose {
+		print!("{} {}", format!("Output: ").bold(), test_output.stdout);
+		println!("{} {}", format!("Expected: ").bold(),
+			fs::read_to_string(output_file.to_string())
+			.expect("Unable to read file"));
+	}
+
 	save_diff(
 		&diff_stdout,
 		&diff_stderr,
@@ -148,7 +157,7 @@ pub fn run_single_test(test_case_name: &String) -> Result<Option<i32>, std::io::
 	Ok(diff_code)
 }
 
-pub fn run_all_tests() {
+pub fn run_all_tests(verbose: bool) {
 	let mut errors_counter = 0;
 	let mut passed_counter = 0;
 	let mut issues_counter = 0;
@@ -180,7 +189,7 @@ pub fn run_all_tests() {
 		))
 		.unwrap();
 
-		let diff_code = match run_single_test(&test_case_name) {
+		let diff_code = match run_single_test(&test_case_name, verbose) {
 			Ok(diff_code) => diff_code,
 			Err(_error) => {
 				errors_counter += 1;
@@ -224,6 +233,6 @@ pub fn run(args: &clap::ArgMatches) {
 			},
 		};
 	} else {
-		run_all_tests();
+		run_all_tests(args.is_present("verbose"));
 	}
 }
