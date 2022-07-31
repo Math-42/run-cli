@@ -27,7 +27,6 @@ pub fn cli() -> Command<'static> {
 			Command::new("test").about("Run all test cases").arg(
 				arg!(-n --number <TEST_CASE_NUMBER> "Specify witch test run")
 					.required(false)
-					.allow_invalid_utf8(true),
 			),
 		)
 		.subcommand(
