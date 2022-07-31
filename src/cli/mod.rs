@@ -24,10 +24,13 @@ pub fn cli() -> Command<'static> {
 		.subcommand(Command::new("build").about("Compile the project"))
 		.subcommand(Command::new("run").about("Runs the project"))
 		.subcommand(
-			Command::new("test").about("Run all test cases").arg(
+			Command::new("test").about("Run all test cases")
+			.arg(
 				arg!(-n --number <TEST_CASE_NUMBER> "Specify witch test run")
 					.required(false)
-					.allow_invalid_utf8(true),
+			)
+			.arg(arg!(-v --verbose "Print the expected output and the output")
+				.required(false)
 			),
 		)
 		.subcommand(
