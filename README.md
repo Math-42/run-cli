@@ -89,7 +89,7 @@ What it can do:
 - [x] Run and compile your code
 - [x] Download all test cases
 - [x] Run your test cases locally
-  - [ ] Run a specific test case
+  - [x] Run a specific test case
 - [x] Generate a report for the test cases output
 - [x] Send your submission to run.codes
 - [ ] Show your run.codes results

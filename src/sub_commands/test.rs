@@ -1,6 +1,7 @@
 use crate::sub_commands::build;
 use crate::utils;
 use colored::Colorize;
+use std::fs;
 
 pub struct TestOutput {
 	pub error: bool,
@@ -91,7 +92,72 @@ pub fn save_diff(
 	.expect("failed to save test diff file");
 }
 
-pub fn run_all_tests() {
+pub fn run_single_test(test_case_name: &String, verbose: bool)
+	-> Result<Option<i32>, std::io::Error> {
+	let test_output = run_test_case(&test_case_name);
+	let time_stamp = chrono::offset::Local::now()
+		.format("%d-%m-%Y_%H:%M:%S")
+		.to_string();
+	let output_file = format!("./test-cases/outputs/{0}/{0}.out", test_case_name);
+
+	std::fs::create_dir_all(format!(
+		"./test-cases/local-attempts/{}/{}",
+		&time_stamp, test_case_name
+	))
+	.unwrap();
+
+	test_output.save(format!(
+		"./test-cases/local-attempts/{}/{1}/{1}",
+		time_stamp, test_case_name
+	));
+
+	if test_output.error {
+		println!("Test {}: {}", test_case_name, "Failed".bold().red());
+		println!("\n{}", test_output.stderr);
+		return Err(std::io::Error::new(
+				std::io::ErrorKind::Other, "Test Output Failed",));
+	}
+
+	let (diff_code, diff_stderr, diff_stdout) = diff(output_file.to_string(),
+		format!("./test-cases/local-attempts/{1}/{0}/{0}.out",
+			test_case_name, time_stamp
+		),
+	);
+
+	match diff_code {
+		Some(0) => println!("Test {}: {}, {} ms",
+			test_case_name,
+			"Passed".bold().green(),
+			test_output.cpu_time
+		),
+		Some(1) => println!("Test {}: {}", test_case_name, "Failed".bold().red()),
+		Some(2) => println!(
+			"Test {}: Missing test files\n\n {}",
+			test_case_name, diff_stderr
+		),
+		Some(code) => panic!("Test {}: Unexpected exit code {}", test_case_name, code),
+		None => (),
+	}
+
+	if verbose {
+		print!("{} {}", format!("Output: ").bold(), test_output.stdout);
+		println!("{} {}", format!("Expected: ").bold(),
+			fs::read_to_string(output_file.to_string())
+			.expect("Unable to read file"));
+	}
+
+	save_diff(
+		&diff_stdout,
+		&diff_stderr,
+		&diff_code,
+		&time_stamp,
+		&test_case_name,
+	);
+
+	Ok(diff_code)
+}
+
+pub fn run_all_tests(verbose: bool) {
 	let mut errors_counter = 0;
 	let mut passed_counter = 0;
 	let mut issues_counter = 0;
@@ -123,51 +189,13 @@ pub fn run_all_tests() {
 		))
 		.unwrap();
 
-		let test_output = run_test_case(&test_case_name);
-
-		test_output.save(format!(
-			"./test-cases/local-attempts/{}/{1}/{1}",
-			time_stamp, test_case_name
-		));
-
-		if test_output.error {
-			println!("Test {}: {}", test_case_name, "Failed".bold().red());
-			errors_counter += 1;
-			println!("\n{}", test_output.stderr);
-			continue;
-		}
-
-		let (diff_code, diff_stderr, diff_stdout) = diff(
-			format!("./test-cases/outputs/{0}/{0}.out", test_case_name),
-			format!(
-				"./test-cases/local-attempts/{1}/{0}/{0}.out",
-				test_case_name, time_stamp
-			),
-		);
-
-		match diff_code {
-			Some(0) => println!(
-				"Test {}: {}, {} ms",
-				test_case_name,
-				"Passed".bold().green(),
-				test_output.cpu_time
-			),
-			Some(1) => println!("Test {}: {}", test_case_name, "Failed".bold().red()),
-			Some(2) => println!(
-				"Test {}: Missing test files\n\n {}",
-				test_case_name, diff_stderr
-			),
-			Some(code) => panic!("Test {}: Unexpected exit code {}", test_case_name, code),
-			None => (),
-		}
-
-		save_diff(
-			&diff_stdout,
-			&diff_stderr,
-			&diff_code,
-			&time_stamp,
-			&test_case_name,
-		);
+		let diff_code = match run_single_test(&test_case_name, verbose) {
+			Ok(diff_code) => diff_code,
+			Err(_error) => {
+				errors_counter += 1;
+				continue;
+			},
+		};
 
 		match diff_code {
 			Some(0) => passed_counter += 1,
@@ -196,9 +224,15 @@ pub fn run(args: &clap::ArgMatches) {
 		return;
 	}
 
-	if !args.is_present("number") {
-		run_all_tests();
+	if args.is_present("number") {
+		match run_single_test(&args.value_of("number").unwrap().to_string()) {
+			Ok(diff_code) => diff_code,
+			Err(_error) => {
+				println!("{}", format!("Error running the test case").bold().red());
+				return;
+			},
+		};
 	} else {
-		println!("sorry, not implemented yet, but you can contribute in: https://github.com/Math-42/run-cli");
+		run_all_tests(args.is_present("verbose"));
 	}
 }
