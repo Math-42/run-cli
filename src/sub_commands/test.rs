@@ -225,7 +225,7 @@ pub fn run(args: &clap::ArgMatches) {
 	}
 
 	if args.is_present("number") {
-		match run_single_test(&args.value_of("number").unwrap().to_string()) {
+		match run_single_test(&args.value_of("number").unwrap().to_string(),args.is_present("verbose")) {
 			Ok(diff_code) => diff_code,
 			Err(_error) => {
 				println!("{}", format!("Error running the test case").bold().red());
